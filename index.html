@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX RACERS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #ff3c3c;
+    --accent2: #ffb800;
+    --neon: #00f0ff;
+    --text: #e8e8f0;
+    --muted: #6a6a8a;
+    --white: #ffffff;
+    --track-asphalt: #2a2a2a;
+    --track-line: #ffffff;
+    --grass: #1a3a1a;
+    --sand: #4a3a1a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  h1, h2, h3, .heading {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── SCREENS ─── */
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .screen.hidden { opacity: 0; pointer-events: none; }
+
+  /* ─── MAIN MENU ─── */
+  #menuScreen {
+    background: radial-gradient(ellipse at 30% 50%, #1a0a20 0%, var(--bg) 60%);
+  }
+
+  .scanlines {
+    position: fixed; inset: 0; pointer-events: none; z-index: 999;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+  }
+
+  .grid-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,60,60,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,60,60,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    transform: perspective(600px) rotateX(60deg) translateY(40%);
+    transform-origin: bottom center;
+  }
+
+  .logo-container {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 100px;
+    line-height: 0.9;
+    background: linear-gradient(135deg, #ff3c3c 0%, #ffb800 50%, #ff3c3c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 30px rgba(255,60,60,0.5));
+    animation: logoGlow 3s ease-in-out infinite;
+  }
+
+  .logo-sub {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  @keyframes logoGlow {
+    0%, 100% { filter: drop-shadow(0 0 30px rgba(255,60,60,0.5)); }
+    50% { filter: drop-shadow(0 0 60px rgba(255,184,0,0.7)); }
+  }
+
+  .menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 1;
+    width: 280px;
+  }
+
+  .btn {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    padding: 14px 32px;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+    clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    left: -100%;
+    top: 0; bottom: 0;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,60,60,0.15), transparent);
+    transition: left 0.4s;
+  }
+
+  .btn:hover::before { left: 100%; }
+  .btn:hover {
+    border-color: var(--accent);
+    color: var(--white);
+    box-shadow: 0 0 20px rgba(255,60,60,0.3), inset 0 0 20px rgba(255,60,60,0.05);
+  }
+
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .btn.primary:hover {
+    background: #ff5555;
+    box-shadow: 0 0 30px rgba(255,60,60,0.6);
+  }
+
+  .btn.neon {
+    border-color: var(--neon);
+    color: var(--neon);
+  }
+  .btn.neon:hover {
+    box-shadow: 0 0 20px rgba(0,240,255,0.4);
+    background: rgba(0,240,255,0.05);
+  }
+
+  .btn.small {
+    font-size: 16px;
+    padding: 10px 20px;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* ─── CAR SELECT ─── */
+  #carSelectScreen {
+    background: radial-gradient(ellipse at 70% 40%, #0f1520 0%, var(--bg) 60%);
+  }
+
+  .screen-title {
+    font-size: 60px;
+    color: var(--white);
+    margin-bottom: 8px;
+    z-index: 1;
+  }
+
+  .screen-subtitle {
+    color: var(--muted);
+    margin-bottom: 40px;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    z-index: 1;
+  }
+
+  .car-carousel {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    z-index: 1;
+    margin-bottom: 40px;
+  }
+
+  .car-arrow {
+    font-size: 32px;
+    cursor: pointer;
+    color: var(--muted);
+    width: 50px; height: 50px;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--border);
+    transition: all 0.2s;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+  .car-arrow:hover { color: var(--accent); border-color: var(--accent); }
+
+  .car-display {
+    width: 400px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    padding: 30px;
+    text-align: center;
+    position: relative;
+    clip-path: polygon(16px 0%, 100% 0%, calc(100% - 16px) 100%, 0% 100%);
+  }
+
+  .car-canvas-wrap {
+    width: 340px;
+    height: 200px;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+
+  #carPreviewCanvas {
+    width: 100%; height: 100%;
+    background: radial-gradient(ellipse, rgba(255,60,60,0.05) 0%, transparent 70%);
+  }
+
+  .car-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .car-class {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 16px;
+  }
+
+  .car-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    text-align: left;
+  }
+
+  .stat-item label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .stat-bar {
+    height: 4px;
+    background: var(--border);
+    position: relative;
+  }
+
+  .stat-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .color-picker {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .color-swatch {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .color-swatch:hover { transform: scale(1.2); }
+  .color-swatch.active { border-color: var(--white); transform: scale(1.15); }
+
+  .car-select-actions {
+    display: flex;
+    gap: 16px;
+    z-index: 1;
+  }
+
+  /* ─── LOBBY ─── */
+  #lobbyScreen {
+    background: radial-gradient(ellipse at 50% 20%, #0a1525 0%, var(--bg) 70%);
+    justify-content: flex-start;
+    padding: 40px;
+  }
+
+  .lobby-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr 320px;
+    gap: 24px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    z-index: 1;
+  }
+
+  .lobby-header {
+    text-align: center;
+    margin-bottom: 30px;
+    z-index: 1;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  .lobby-title {
+    font-size: 54px;
+    color: var(--white);
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+    position: relative;
+  }
+
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  .panel-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+
+  .player-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .player-slot {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    min-height: 52px;
+    position: relative;
+  }
+
+  .player-slot.empty {
+    opacity: 0.4;
+    border-style: dashed;
+  }
+
+  .player-color-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .player-name {
+    font-weight: 600;
+    font-size: 15px;
+    flex: 1;
+  }
+
+  .player-car {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .player-ready {
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .player-ready.yes { color: #00ff88; }
+  .player-ready.no { color: var(--muted); }
+
+  .host-badge {
+    font-size: 10px;
+    background: var(--accent2);
+    color: #000;
+    padding: 2px 6px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-left: 6px;
+  }
+
+  .chat-area {
+    display: flex;
+    flex-direction: column;
+    height: 300px;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+    padding-right: 6px;
+  }
+
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .chat-msg {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .chat-msg .sender {
+    font-weight: 700;
+    margin-right: 6px;
+  }
+
+  .chat-msg.system {
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  input[type="text"], input[type="number"] {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="text"]:focus, input[type="number"]:focus {
+    border-color: var(--accent);
+  }
+
+  .map-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .map-card {
+    border: 2px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .map-card:hover { border-color: var(--neon); }
+  .map-card.selected { border-color: var(--accent2); }
+
+  .map-card canvas {
+    display: block;
+    width: 100%;
+    height: 80px;
+  }
+
+  .map-card-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    text-align: center;
+    padding: 6px;
+    background: var(--surface2);
+    letter-spacing: 1px;
+  }
+
+  .map-card.selected .map-card-name {
+    color: var(--accent2);
+  }
+
+  .lobby-room-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .room-id-display {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 12px 16px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--neon);
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .room-id-display:hover {
+    background: rgba(0,240,255,0.05);
+  }
+
+  .room-id-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  .network-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  .net-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    animation: netPulse 1.5s ease infinite;
+  }
+  .net-dot.online { background: #00ff88; }
+  .net-dot.offline { background: var(--muted); animation: none; }
+  .net-dot.connecting { background: var(--accent2); }
+
+  @keyframes netPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ─── GAME SCREEN ─── */
+  #gameScreen {
+    background: #000;
+    flex-direction: row;
+  }
+
+  #gameCanvas {
+    display: block;
+  }
+
+  .hud {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    pointer-events: none;
+    z-index: 100;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .hud-box {
+    background: rgba(10,10,15,0.85);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    backdrop-filter: blur(8px);
+  }
+
+  .hud-speed {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--white);
+  }
+
+  .hud-speed-unit {
+    font-size: 14px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: -6px;
+  }
+
+  .hud-lap {
+    text-align: center;
+  }
+
+  .hud-lap-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    line-height: 1;
+    color: var(--white);
+  }
+
+  .hud-lap-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+
+  .hud-position {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px;
+    color: var(--accent2);
+    line-height: 1;
+    text-align: right;
+  }
+
+  .hud-pos-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .minimap-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+    border: 1px solid var(--border);
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(8px);
+  }
+
+  #minimapCanvas {
+    display: block;
+  }
+
+  .leaderboard {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 100;
+    background: rgba(10,10,15,0.85);
+    border: 1px solid var(--border);
+    padding: 12px 16px;
+    min-width: 200px;
+    backdrop-filter: blur(8px);
+  }
+
+  .lb-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+  }
+
+  .lb-entry {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .lb-pos {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    width: 22px;
+    color: var(--muted);
+  }
+
+  .lb-pos.p1 { color: var(--accent2); }
+  .lb-pos.p2 { color: #aaa; }
+  .lb-pos.p3 { color: #cd7f32; }
+
+  .lb-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  .lb-name { flex: 1; }
+
+  .lb-time {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: monospace;
+  }
+
+  .countdown-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    pointer-events: none;
+  }
+
+  .countdown-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 200px;
+    color: var(--white);
+    animation: countPop 1s ease forwards;
+  }
+
+  @keyframes countPop {
+    0% { transform: scale(2); opacity: 0; }
+    30% { transform: scale(1); opacity: 1; }
+    70% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.5); opacity: 0; }
+  }
+
+  /* ─── CONNECT MODAL ─── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.hidden { display: none; }
+
+  .modal {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    padding: 36px;
+    max-width: 460px;
+    width: 90%;
+    position: relative;
+  }
+
+  .modal::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .modal-title {
+    font-size: 40px;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+
+  .modal-desc {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+
+  .input-group {
+    margin-bottom: 16px;
+  }
+
+  .input-group label {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .input-group input {
+    width: 100%;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .or-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .or-divider::before, .or-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ─── RACE FINISH ─── */
+  #finishScreen {
+    background: radial-gradient(ellipse at 50% 50%, #1a0a00 0%, var(--bg) 60%);
+    z-index: 300;
+  }
+
+  .podium {
+    display: flex;
+    align-items: flex-end;
+    gap: 0;
+    margin-bottom: 40px;
+    z-index: 1;
+  }
+
+  .podium-place {
+    text-align: center;
+    padding: 20px 30px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    position: relative;
+  }
+
+  .podium-place.p1 {
+    height: 200px;
+    background: linear-gradient(180deg, rgba(255,184,0,0.1) 0%, var(--surface) 100%);
+    border-color: var(--accent2);
+    order: 2;
+  }
+
+  .podium-place.p2 {
+    height: 160px;
+    order: 1;
+  }
+
+  .podium-place.p3 {
+    height: 130px;
+    order: 3;
+  }
+
+  .podium-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 60px;
+    color: var(--border);
+  }
+
+  .podium-place.p1 .podium-num { color: var(--accent2); }
+  .podium-place.p2 .podium-num { color: #aaa; }
+  .podium-place.p3 .podium-num { color: #cd7f32; }
+
+  .podium-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: var(--white);
+  }
+
+  .podium-time {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: monospace;
+  }
+
+  /* ─── CONTROLS ─── */
+  .controls-display {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 100;
+    background: rgba(10,10,15,0.85);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+  }
+
+  .key {
+    display: inline-block;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    font-size: 11px;
+    margin: 0 2px;
+    color: var(--text);
+  }
+
+  .notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface);
+    border: 2px solid var(--neon);
+    padding: 10px 24px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: var(--neon);
+    z-index: 600;
+    animation: notifSlide 3s forwards;
+    pointer-events: none;
+  }
+
+  @keyframes notifSlide {
+    0% { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+    10% { transform: translateX(-50%) translateY(0); opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  .tab-row {
+    display: flex;
+    gap: 0;
+    margin-bottom: 0;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .tab {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    padding: 10px 20px;
+    cursor: pointer;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .laps-select {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  .laps-select label {
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .laps-select input {
+    width: 60px;
+  }
+</style>
+</head>
+<body>
+
+<div class="scanlines"></div>
+
+<!-- ═══════════════════════ MAIN MENU ═══════════════════════ -->
+<div id="menuScreen" class="screen">
+  <div class="grid-bg"></div>
+  <div class="logo-container">
+    <div class="logo">APEX<br>RACERS</div>
+    <div class="logo-sub">Multiplayer Racing</div>
+  </div>
+  <div class="menu-buttons">
+    <button class="btn primary" onclick="showScreen('carSelectScreen', 'race')">QUICK RACE</button>
+    <button class="btn neon" onclick="showScreen('carSelectScreen', 'lobby')">MULTIPLAYER LOBBY</button>
+    <button class="btn" onclick="showModal('howtoModal')">HOW TO PLAY</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ CAR SELECT ═══════════════════════ -->
+<div id="carSelectScreen" class="screen hidden">
+  <h2 class="screen-title heading">CHOOSE YOUR CAR</h2>
+  <p class="screen-subtitle">SELECT VEHICLE &amp; COLOR</p>
+  <div class="car-carousel">
+    <div class="car-arrow" onclick="prevCar()">◀</div>
+    <div class="car-display">
+      <div class="car-canvas-wrap">
+        <canvas id="carPreviewCanvas" width="340" height="200"></canvas>
+      </div>
+      <div class="car-name" id="carName">THUNDERBOLT</div>
+      <div class="car-class" id="carClass">CLASS S · FORMULA</div>
+      <div class="car-stats" id="carStats"></div>
+      <div class="color-picker" id="colorPicker"></div>
+    </div>
+    <div class="car-arrow" onclick="nextCar()">▶</div>
+  </div>
+  <div class="car-select-actions">
+    <button class="btn small" onclick="goBack()">← BACK</button>
+    <button class="btn primary small" onclick="confirmCarSelect()">SELECT CAR →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ LOBBY ═══════════════════════ -->
+<div id="lobbyScreen" class="screen hidden">
+  <div class="lobby-header">
+    <h2 class="lobby-title heading">RACE LOBBY</h2>
+  </div>
+  <div class="lobby-layout">
+    <!-- Left: Players -->
+    <div>
+      <div class="panel">
+        <div class="panel-title">Players ( <span id="playerCount">0</span> / 4 )</div>
+        <div class="player-list" id="playerList"></div>
+      </div>
+      <br>
+      <div class="panel">
+        <div class="panel-title">Room</div>
+        <div class="lobby-room-info">
+          <div>
+            <div class="room-id-display" id="roomIdDisplay" title="Click to copy" onclick="copyRoomId()">------</div>
+            <div class="room-id-label">ROOM CODE — CLICK TO COPY</div>
+          </div>
+          <div class="network-status">
+            <div class="net-dot" id="netDot"></div>
+            <span id="netStatus">Not connected</span>
+          </div>
+          <button class="btn small neon" onclick="showModal('connectModal')">INVITE / JOIN</button>
+          <div class="laps-select">
+            <label>Laps:</label>
+            <input type="number" id="lapsInput" value="3" min="1" max="10" style="width:60px" onchange="updateLaps()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Map + Chat -->
+    <div>
+      <div class="panel">
+        <div class="panel-title">Select Map</div>
+        <div class="map-selector" id="mapSelector"></div>
+      </div>
+      <br>
+      <div class="panel">
+        <div class="panel-title">Chat</div>
+        <div class="chat-area">
+          <div class="chat-messages" id="chatMessages"></div>
+          <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="Type a message..." style="flex:1" onkeydown="chatKeyDown(event)">
+            <button class="btn small" onclick="sendChatMsg()">SEND</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Controls -->
+    <div>
+      <div class="panel">
+        <div class="panel-title">Ready Up</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn" id="readyBtn" onclick="toggleReady()">I'M READY</button>
+          <button class="btn primary" id="startBtn" onclick="startRace()" disabled>START RACE</button>
+          <button class="btn small" onclick="goBack()">← BACK TO MENU</button>
+        </div>
+      </div>
+      <br>
+      <div class="panel">
+        <div class="panel-title">Race Settings</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.8" id="raceSettingsDisplay">
+          Map: <span style="color:var(--text)" id="settingsMapName">City Circuit</span><br>
+          Laps: <span style="color:var(--text)" id="settingsLaps">3</span><br>
+          Players: <span style="color:var(--text)" id="settingsPlayers">0 / 4</span><br>
+          Your Car: <span style="color:var(--text)" id="settingsCar">—</span>
+        </div>
+      </div>
+      <br>
+      <div class="panel">
+        <div class="panel-title">Controls</div>
+        <div style="font-size:13px;color:var(--muted);line-height:2">
+          <span class="key">W</span> / <span class="key">↑</span> Accelerate<br>
+          <span class="key">S</span> / <span class="key">↓</span> Brake / Reverse<br>
+          <span class="key">A</span> <span class="key">D</span> Steer<br>
+          <span class="key">SPACE</span> Handbrake<br>
+          <span class="key">ESC</span> Pause
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ GAME ═══════════════════════ -->
+<div id="gameScreen" class="screen hidden">
+  <canvas id="gameCanvas"></canvas>
+  <div class="hud">
+    <div class="hud-box">
+      <div class="hud-speed" id="hudSpeed">0</div>
+      <div class="hud-speed-unit">km/h</div>
+    </div>
+    <div class="hud-box hud-lap">
+      <div class="hud-lap-num"><span id="hudCurrentLap">1</span> / <span id="hudTotalLaps">3</span></div>
+      <div class="hud-lap-label">LAP</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px;font-family:monospace" id="hudLapTime">0:00.000</div>
+    </div>
+    <div class="hud-box">
+      <div class="hud-position" id="hudPosition">1</div>
+      <div class="hud-pos-label">POSITION</div>
+    </div>
+  </div>
+  <div class="leaderboard" id="leaderboard">
+    <div class="lb-title">STANDINGS</div>
+    <div id="lbEntries"></div>
+  </div>
+  <canvas id="minimapCanvas" width="160" height="120" class="minimap-container"></canvas>
+  <div class="controls-display">
+    <span class="key">W/↑</span> Gas &nbsp; <span class="key">S/↓</span> Brake &nbsp; <span class="key">A/D</span> Steer &nbsp; <span class="key">SPC</span> Handbrake &nbsp; <span class="key">ESC</span> Pause
+  </div>
+</div>
+
+<!-- ═══════════════════════ FINISH ═══════════════════════ -->
+<div id="finishScreen" class="screen hidden">
+  <h1 class="heading" style="font-size:80px;color:var(--accent2);margin-bottom:10px;z-index:1">RACE OVER</h1>
+  <p class="screen-subtitle" style="z-index:1">FINAL RESULTS</p>
+  <div class="podium" id="podium"></div>
+  <div style="display:flex;gap:16px;z-index:1">
+    <button class="btn small" onclick="returnToLobby()">BACK TO LOBBY</button>
+    <button class="btn primary small" onclick="returnToMenu()">MAIN MENU</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ CONNECT MODAL ═══════════════════════ -->
+<div id="connectModal" class="modal-overlay hidden">
+  <div class="modal">
+    <h2 class="modal-title heading">MULTIPLAYER</h2>
+    <p class="modal-desc">Host a room and share the code, or join a friend's room.</p>
+    <div class="tab-row">
+      <div class="tab active" onclick="switchTab('host')">HOST</div>
+      <div class="tab" onclick="switchTab('join')">JOIN</div>
+    </div>
+    <div id="hostTab" style="margin-top:16px">
+      <div style="color:var(--muted);font-size:14px;margin-bottom:16px;line-height:1.6">
+        Your room code is shown in the lobby. Share it with friends so they can join. The game uses peer-to-peer connection via your browser.
+      </div>
+      <div class="input-group">
+        <label>Your Name</label>
+        <input type="text" id="hostNameInput" placeholder="Enter your name" maxlength="16">
+      </div>
+      <div class="modal-actions">
+        <button class="btn primary small" onclick="createRoom()">CREATE ROOM</button>
+        <button class="btn small" onclick="closeModal('connectModal')">CANCEL</button>
+      </div>
+    </div>
+    <div id="joinTab" style="margin-top:16px;display:none">
+      <div class="input-group">
+        <label>Your Name</label>
+        <input type="text" id="joinNameInput" placeholder="Enter your name" maxlength="16">
+      </div>
+      <div class="input-group">
+        <label>Room Code</label>
+        <input type="text" id="joinRoomInput" placeholder="Enter 6-character code" maxlength="6" style="text-transform:uppercase;letter-spacing:3px;font-family:'Bebas Neue',sans-serif;font-size:20px">
+      </div>
+      <div class="modal-actions">
+        <button class="btn primary small" onclick="joinRoom()">JOIN ROOM</button>
+        <button class="btn small" onclick="closeModal('connectModal')">CANCEL</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ HOW TO PLAY ═══════════════════════ -->
+<div id="howtoModal" class="modal-overlay hidden">
+  <div class="modal">
+    <h2 class="modal-title heading">HOW TO PLAY</h2>
+    <div style="color:var(--muted);font-size:14px;line-height:2">
+      <b style="color:var(--text)">Single Player:</b> Quick Race — drive solo on any map.<br>
+      <b style="color:var(--text)">Multiplayer:</b> Click Multiplayer Lobby → Invite/Join → Create or Join a room using the 6-digit code.<br>
+      <b style="color:var(--text)">Controls:</b><br>
+      <span class="key">W</span> / <span class="key">↑</span> — Accelerate<br>
+      <span class="key">S</span> / <span class="key">↓</span> — Brake / Reverse<br>
+      <span class="key">A</span> <span class="key">D</span> — Steer<br>
+      <span class="key">SPACE</span> — Handbrake<br>
+      <span class="key">ESC</span> — Pause / Return<br><br>
+      <b style="color:var(--text)">Network:</b> Uses WebRTC peer-to-peer. The host shares their room code. Up to 4 players. Each client connects directly — no server needed beyond signaling.
+    </div>
+    <div class="modal-actions" style="margin-top:20px">
+      <button class="btn primary small" onclick="closeModal('howtoModal')">GOT IT</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAUSE ═══════════════════════ -->
+<div id="pauseModal" class="modal-overlay hidden">
+  <div class="modal" style="text-align:center">
+    <h2 class="modal-title heading">PAUSED</h2>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:20px">
+      <button class="btn primary small" onclick="resumeGame()">RESUME</button>
+      <button class="btn small" onclick="quitToLobby()">QUIT TO LOBBY</button>
+      <button class="btn small" onclick="returnToMenu()">MAIN MENU</button>
+    </div>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
