@@ -85,3 +85,19 @@ button:hover {
   font-size: 24px;
   color: #ccc;
 }
+
+.upgrade-ui {
+  position: absolute;
+  right: 20px;
+  top: 120px;
+
+  background: #222;
+  padding: 15px;
+  border-radius: 10px;
+
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+
+  color: white;
+}

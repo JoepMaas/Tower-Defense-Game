@@ -12,6 +12,7 @@ Normal
 Hard
 Endless
 Multiple tower types
+Upgrade towers
 Basic Tower
 Rapid Tower
 Sniper Tower
@@ -85,8 +86,6 @@ Save system
 Pause menu
 Different enemy classes
 Animated effects
-Mobile support
-Multiplayer support
 Controls
 Action	Control
 Select Tower	Click Tower Button

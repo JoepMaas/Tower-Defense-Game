@@ -11,6 +11,7 @@ let wave = 1;
 let selectedTower = null;
 let gamemode = "normal";
 let waveInProgress = false;
+let selectedTowerForUpgrade = null;
 
 const towers = [];
 const enemies = [];
@@ -96,6 +97,29 @@ canvas.addEventListener("click", (e) => {
     }
   }
 
+  canvas.addEventListener("contextmenu", (e) => {
+  e.preventDefault();
+
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  selectedTowerForUpgrade = null;
+
+  for (let tower of towers) {
+    const dx = tower.x - x;
+    const dy = tower.y - y;
+
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist < 20) {
+      selectedTowerForUpgrade = tower;
+      openUpgradeUI(tower);
+      break;
+    }
+  }
+});
+
   // PREVENT TOWERS OVERLAPPING
   for (let tower of towers) {
 
@@ -135,15 +159,18 @@ canvas.addEventListener("click", (e) => {
 
     gold -= cost;
 
-    towers.push({
-      x,
-      y,
-      range,
-      fireRate,
-      damage,
-      color,
-      cooldown: 0
-    });
+   towers.push({
+  x,
+  y,
+  range,
+  fireRate,
+  damage,
+  color,
+  cooldown: 0,
+  level: 1,
+  baseRange: range,
+  baseDamage: damage
+});
 
     updateUI();
   }
@@ -365,15 +392,24 @@ function drawPath() {
 
 function drawTowers() {
   towers.forEach(tower => {
+
     ctx.fillStyle = tower.color;
     ctx.beginPath();
     ctx.arc(tower.x, tower.y, 20, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.strokeStyle = "rgba(255,255,255,0.15)";
-    ctx.beginPath();
-    ctx.arc(tower.x, tower.y, tower.range, 0, Math.PI * 2);
-    ctx.stroke();
+    // SHOW RANGE ONLY IF HOVERED
+    if (tower === hoveredTower) {
+      ctx.strokeStyle = "rgba(255,255,255,0.25)";
+      ctx.beginPath();
+      ctx.arc(tower.x, tower.y, tower.range, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // LEVEL TEXT
+    ctx.fillStyle = "white";
+    ctx.font = "12px Arial";
+    ctx.fillText(`Lv ${tower.level}`, tower.x - 12, tower.y - 25);
   });
 }
 
@@ -415,4 +451,62 @@ function gameLoop() {
   draw();
 
   requestAnimationFrame(gameLoop);
+}
+
+let hoveredTower = null;
+
+canvas.addEventListener("mousemove", (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  hoveredTower = null;
+
+  for (let tower of towers) {
+    const dx = tower.x - x;
+    const dy = tower.y - y;
+
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist < 20) {
+      hoveredTower = tower;
+      break;
+    }
+  }
+}); 
+
+function openUpgradeUI(tower) {
+  document.getElementById("upgradeUI").style.display = "flex";
+
+  document.getElementById("towerInfo").textContent =
+    `Level: ${tower.level}
+Damage: ${tower.damage}
+Range: ${tower.range}`;
+}
+
+function closeUpgradeUI() {
+  document.getElementById("upgradeUI").style.display = "none";
+  selectedTowerForUpgrade = null;
+}
+
+function upgradeTower() {
+  if (!selectedTowerForUpgrade) return;
+
+  const tower = selectedTowerForUpgrade;
+
+  const cost = 100 * tower.level;
+
+  if (gold < cost) return;
+
+  gold -= cost;
+
+  tower.level++;
+
+  // SCALE STATS
+  tower.damage = Math.floor(tower.baseDamage * (1 + tower.level * 0.35));
+  tower.range = tower.baseRange + tower.level * 20;
+  tower.fireRate = Math.max(10, tower.fireRate - 3);
+
+  updateUI();
+  openUpgradeUI(tower);
 }
