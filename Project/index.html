@@ -20,8 +20,38 @@
     </div>
   </div>
 
+  <div id="mapMenu" class="menu-screen" style="display:none;">
+
+  <h1>Select Map</h1>
+
+  <div class="menu-box">
+
+    <button onclick="loadMap('classic')">
+      Classic Valley
+    </button>
+
+    <button onclick="loadMap('snake')">
+      Snake Road
+    </button>
+
+    <button onclick="loadMap('cross')">
+      Crossroads
+    </button>
+
+    <button onclick="loadMap('spiral')">
+      Spiral Path
+    </button>
+
+  </div>
+
+</div>
+
   <div id="gameUI">
     <div class="topbar">
+      <div>
+        🗺 Map:
+      <span id="mapName"></span>
+      </div>
       <div>❤ Health: <span id="health">100</span></div>
       <div>💰 Gold: <span id="gold">300</span></div>
       <div>🌊 Wave: <span id="wave">1</span></div>
@@ -31,6 +61,10 @@
       <button onclick="selectTower('basic')">Basic Tower ($100)</button>
       <button onclick="selectTower('rapid')">Rapid Tower ($150)</button>
       <button onclick="selectTower('sniper')">Sniper Tower ($250)</button>
+      <button onclick="selectTower('splash')">Splash Tower ($300)</button>
+<button onclick="selectTower('freeze')">Freeze Tower ($275)</button>
+<button onclick="selectTower('laser')">Laser Tower ($500)</button>
+<button onclick="selectTower('poison')">Poison Tower ($350)</button>
     </div>
 
     <canvas id="gameCanvas" width="1000" height="600"></canvas>
@@ -49,10 +83,18 @@
 
   <p id="towerInfo"></p>
 
-  <button onclick="upgradeTower()">Upgrade</button>
-  <button onclick="closeUpgradeUI()">Close</button>
+  <button onclick="upgradeTower()">
+    Upgrade Tower
+  </button>
+
+  <button onclick="sellTower()">
+    Sell Tower
+  </button>
+
+  <button onclick="closeUpgradeUI()">
+    Close
+  </button>
 </div>
-  
 
   <script src="script.js"></script>
 </body>
