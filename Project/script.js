@@ -5,6 +5,9 @@ const healthText = document.getElementById("health");
 const goldText = document.getElementById("gold");
 const waveText = document.getElementById("wave");
 
+let paused = false;
+let gameSpeed = 1;
+
 const MAX_NORMAL_WAVE = 20;
 const MAX_HARD_WAVE = 30;
 let gameEnded = false;
@@ -286,6 +289,7 @@ class Enemy {
   }
 
   update() {
+    if (paused) return;
     const target = path[this.pathIndex + 1];
 
     let actualSpeed = this.speed;
@@ -301,9 +305,15 @@ class Enemy {
 
     if (!target) {
       health -= 10;
+      if (health <= 0) {
+  health = 0;
+  updateUI();
+  endGame(false);
+  return;
+}
       updateUI();
 
-      enemies.splice(enemies.indexOf(this), 1);
+      this.dead = true;
       return;
     }
 
@@ -321,6 +331,34 @@ class Enemy {
   }
 
   draw() {
+    if (this.finalBoss) {
+
+      ctx.strokeStyle = "#ff0000";
+      ctx.lineWidth = 8;
+
+      ctx.beginPath();
+
+      ctx.arc(
+        this.x,
+        this.y,
+        this.radius + 12,
+        0,
+        Math.PI * 2
+      );
+
+      ctx.stroke();
+
+      ctx.fillStyle = "gold";
+
+      ctx.font = "bold 20px Arial";
+
+      ctx.fillText(
+        "FINAL BOSS",
+        this.x - 55,
+        this.y - 50
+      );
+    }
+    updateBossBar();
     ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
@@ -373,7 +411,7 @@ function loadMap(mapName) {
   path = maps[mapName];
 
   document.getElementById("mapMenu").style.display = "none";
-  document.getElementById("gameUI").style.display = "flex";
+  document.getElementById("gameContainer").style.display = "flex";
 
   startActualGame();
 }
@@ -415,75 +453,37 @@ class Bullet {
     this.towerType = towerType;
   }
 
-  update() {
+update() {
 
-    if (
-      !this.target ||
-      !enemies.includes(this.target)
-    ) {
-      bullets.splice(
-        bullets.indexOf(this),
-        1
-      );
-      return;
-    }
-
-    const dx = this.target.x - this.x;
-    const dy = this.target.y - this.y;
-
-    const dist = Math.sqrt(dx * dx + dy * dy);
-
-    this.x += (dx / dist) * this.speed;
-    this.y += (dy / dist) * this.speed;
-
-    if (dist < 10) {
-      this.target.hp = Math.max(
-        0,
-        this.target.hp - this.damage
-      );
-
-      if (this.towerType === "freeze") {
-        this.target.slowTimer = 120;
-      }
-      if (this.towerType === "poison") {
-        this.target.poisonTimer = 300;
-      }
-
-      if (this.towerType === "splash") {
-
-        enemies.forEach(enemy => {
-
-          const dx = enemy.x - this.target.x;
-          const dy = enemy.y - this.target.y;
-
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 60) {
-            enemy.hp -= this.damage;
-          }
-
-        });
-
-      }
-
-      if (this.target.hp <= 0) {
-
-        gold += this.target.isBoss ? 300 : 25;
-
-        const enemyIndex =
-          enemies.indexOf(this.target);
-
-        if (enemyIndex !== -1) {
-          enemies.splice(enemyIndex, 1);
-        }
-
-        updateUI();
-      }
-
-      bullets.splice(bullets.indexOf(this), 1);
-    }
+  if (!this.target || !enemies.includes(this.target) || this.target.dead) {
+    bullets.splice(bullets.indexOf(this), 1);
+    return;
   }
 
+  const dx = this.target.x - this.x;
+  const dy = this.target.y - this.y;
+
+  const dist = Math.sqrt(dx * dx + dy * dy);
+
+  // ✅ TRUE HIT CHECK (BEFORE overshooting)
+  if (dist < this.speed + this.target.radius) {
+
+    console.log("HIT:", this.damage);
+
+    this.target.hp -= this.damage;
+
+    if (this.target.hp <= 0) {
+      this.target.dead = true;
+    }
+
+    bullets.splice(bullets.indexOf(this), 1);
+    return;
+  }
+
+  // MOVE
+  this.x += (dx / dist) * this.speed;
+  this.y += (dy / dist) * this.speed;
+}
   draw() {
     ctx.fillStyle = "white";
     ctx.beginPath();
@@ -491,6 +491,8 @@ class Bullet {
     ctx.fill();
   }
 }
+
+
 
 function spawnWave() {
 
@@ -502,9 +504,33 @@ function spawnWave() {
 
     const bossSpeed = 0.7 + (wave * 0.01);
 
-    if (gamemode === "normal" && wave === 20 || gamemode === "hard" && wave === 30)
-    {
-      bossHP *= 3;
+    const finalBoss =
+      (
+        gamemode === "normal" &&
+        wave === 20
+      )
+      ||
+      (
+        gamemode === "hard" &&
+        wave === 30
+      );
+
+    if (finalBoss) {
+
+      bossHP *= 5;
+
+      enemies.push(
+        new Enemy(
+          bossSpeed,
+          bossHP,
+          "#ff0000",
+          true
+        )
+      );
+
+      enemies[enemies.length - 1].finalBoss = true;
+
+      return;
     }
 
     enemies.push(
@@ -553,17 +579,36 @@ function spawnWave() {
 
   }
 }
+
 function update() {
 
   // UPDATE ENEMIES
   for (let i = enemies.length - 1; i >= 0; i--) {
+    const enemy = enemies[i];
+    if (!enemy) continue; 
 
-    if (!enemies[i]) continue;
-
-    enemies[i].update();
+    for (let s = 0; s < gameSpeed; s++) {
+      enemy.update();
+    }
   }
 
-  // UPDATE TOWERS
+  // REMOVE DEAD ENEMIES
+ for (let i = enemies.length - 1; i >= 0; i--) {
+
+  if (enemies[i].dead) {
+
+    const enemy = enemies[i];
+
+    // 💰 REWARD LOGIC
+    gold += enemy.isBoss ? 300 : 25;
+
+    updateUI();
+
+    enemies.splice(i, 1);
+  }
+}
+
+  // UPDATE TOWERS  ✅ MUST BE HERE
   towers.forEach(tower => {
 
     tower.cooldown--;
@@ -571,12 +616,10 @@ function update() {
     const target = enemies.find(enemy => {
       const dx = enemy.x - tower.x;
       const dy = enemy.y - tower.y;
-
       return Math.sqrt(dx * dx + dy * dy) <= tower.range;
     });
 
     if (target && tower.cooldown <= 0) {
-
       bullets.push(
         new Bullet(
           tower.x,
@@ -589,55 +632,49 @@ function update() {
 
       tower.cooldown = tower.fireRate;
     }
-
   });
 
   // UPDATE BULLETS
   for (let i = bullets.length - 1; i >= 0; i--) {
-    bullets[i].update();
+    for (let s = 0; s < gameSpeed; s++) {
+      if (bullets[i]) bullets[i].update();
+    }
   }
 
-  // PREVENT WAVE BUG
-if (
-  enemies.length === 0 &&
-  !waveInProgress
-) {
+  // WAVE LOGIC
+  if (enemies.length === 0 && !waveInProgress) {
 
-  if (checkVictory()) {
-    endGame(true);
-    return;
-  }
+    waveInProgress = true;
 
-  waveInProgress = true;
+    setTimeout(() => {
 
-  setTimeout(() => {
+      const maxWave =
+        gamemode === "hard"
+          ? MAX_HARD_WAVE
+          : MAX_NORMAL_WAVE;
 
-    const maxWave =
-      gamemode === "hard"
-        ? MAX_HARD_WAVE
-        : MAX_NORMAL_WAVE;
+      if (
+        gamemode !== "endless" &&
+        wave >= maxWave
+      ) {
+        if (checkVictory()) endGame(true);
+        return;
+      }
 
-    // Endless always continues
-    if (
-      gamemode !== "endless" &&
-      wave >= maxWave
-    ) {
+      wave++;
+
+      showWaveBanner();
+      updateUI();
+      spawnWave();
+
+      waveInProgress = false;
+
       if (checkVictory()) {
         endGame(true);
       }
-      return;
-    }
 
-    wave++;
-
-    updateUI();
-
-    spawnWave();
-
-    waveInProgress = false;
-
-  }, 2000);
-}
+    }, 2000);
+  }
 }
 
 function drawPath() {
@@ -923,7 +960,7 @@ function returnToMainMenu() {
   selectedTowerForUpgrade = null;
 
   // hide game screens
-  document.getElementById("gameUI").style.display = "none";
+  document.getElementById("gameContainer").style.display = "none";
   document.getElementById("upgradeUI").style.display = "none";
   document.getElementById("endScreen").style.display = "none";
   document.getElementById("mapMenu").style.display = "none";
@@ -932,4 +969,57 @@ function returnToMainMenu() {
   document.getElementById("mainMenu").style.display = "flex";
 
   updateUI();
+}
+
+function updateBossBar() {
+
+  const boss = enemies.find(e => e.isBoss);
+
+  const container =
+    document.getElementById("bossContainer");
+
+  const bar =
+    document.getElementById("bossBarInner");
+
+  if (!boss) {
+    container.style.display = "none";
+    return;
+  }
+
+  container.style.display = "block";
+
+  const percent =
+    (boss.hp / boss.maxHp) * 100;
+
+  bar.style.width = percent + "%";
+}
+
+function togglePause() {
+
+  paused = !paused;
+
+  document.getElementById("pauseBtn")
+    .textContent =
+    paused ? "Resume" : "Pause";
+}
+
+function toggleFastForward() {
+
+  gameSpeed =
+    gameSpeed === 1 ? 2 : 1;
+}
+
+function showWaveBanner() {
+
+  const banner =
+    document.getElementById("waveBanner");
+
+  banner.innerText =
+    "Wave " + wave;
+
+  banner.classList.add("show");
+
+  setTimeout(() => {
+    banner.classList.remove("show");
+  }, 2000);
 }

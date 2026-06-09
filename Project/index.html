@@ -1,101 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Top Down Tower Defense</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Tower Defense</title>
+
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div id="mainMenu" class="menu-screen">
-    <h1>Top Down Tower Defense</h1>
+    <!-- MAIN MENU -->
+    <div id="mainMenu" class="screen active">
 
-    <div class="menu-box">
-      <h2>Select Gamemode</h2>
+        <div class="menu-card">
 
-      <button onclick="startGame('normal')">Normal Mode</button>
-      <button onclick="startGame('hard')">Hard Mode</button>
-      <button onclick="startGame('endless')">Endless Mode</button>
-    </div>
-  </div>
+            <h1 class="title">TOWER DEFENSE</h1>
 
-  <div id="mapMenu" class="menu-screen" style="display:none;">
+            <p class="subtitle">
+                Modern Strategy Defense Game
+            </p>
 
-  <h1>Select Map</h1>
+            <div class="menu-buttons">
 
-  <div class="menu-box">
+                <button onclick="startGame('normal')">
+                    Normal Mode
+                </button>
 
-    <button onclick="loadMap('classic')">
-      Classic Valley
-    </button>
+                <button onclick="startGame('hard')">
+                    Hard Mode
+                </button>
 
-    <button onclick="loadMap('snake')">
-      Snake Road
-    </button>
+                <button onclick="startGame('endless')">
+                    Endless Mode
+                </button>
 
-    <button onclick="loadMap('cross')">
-      Crossroads
-    </button>
+            </div>
 
-    <button onclick="loadMap('spiral')">
-      Spiral Path
-    </button>
+        </div>
 
-  </div>
-
-</div>
-
-  <div id="gameUI">
-    <div class="topbar">
-      <div>
-        🗺 Map:
-      <span id="mapName"></span>
-      </div>
-      <div>❤ Health: <span id="health">100</span></div>
-      <div>💰 Gold: <span id="gold">300</span></div>
-      <div>🌊 Wave: <span id="wave">1</span></div>
     </div>
 
-    <div class="tower-buttons">
-      <button onclick="selectTower('basic')">Basic Tower ($100)</button>
-      <button onclick="selectTower('rapid')">Rapid Tower ($150)</button>
-      <button onclick="selectTower('sniper')">Sniper Tower ($250)</button>
-      <button onclick="selectTower('splash')">Splash Tower ($300)</button>
-<button onclick="selectTower('freeze')">Freeze Tower ($275)</button>
-<button onclick="selectTower('laser')">Laser Tower ($500)</button>
-<button onclick="selectTower('poison')">Poison Tower ($350)</button>
+    <!-- MAP SELECTION -->
+    <div id="mapMenu" class="screen">
+
+        <div class="menu-card large">
+
+            <h2>Select Map</h2>
+
+            <div class="map-grid">
+
+                <button onclick="loadMap('classic')" class="map-card">
+                    <h3>Classic Valley</h3>
+                    <p>Balanced beginner map.</p>
+                </button>
+
+                <button onclick="loadMap('snake')" class="map-card">
+                    <h3>Snake Road</h3>
+                    <p>Long winding route.</p>
+                </button>
+
+                <button onclick="loadMap('cross')" class="map-card">
+                    <h3>Crossroads</h3>
+                    <p>Compact defense area.</p>
+                </button>
+
+                <button onclick="loadMap('spiral')" class="map-card">
+                    <h3>Spiral Fortress</h3>
+                    <p>Maximum tower coverage.</p>
+                </button>
+
+            </div>
+
+            <button class="secondary-btn"
+                onclick="backToMainMenu()">
+                Back
+            </button>
+
+        </div>
+
     </div>
 
-    <canvas id="gameCanvas" width="1000" height="600"></canvas>
-    <div id="endScreen" class="end-screen">
-  <h1 id="endTitle">Game Over</h1>
-  <p id="endStats"></p>
+    <!-- GAME -->
+    <div id="gameContainer">
 
-  <button onclick="location.reload()">
-    Return To Menu
-  </button>
-</div>
-  </div>
+        <!-- TOP HUD -->
+        <div id="topBar">
 
-  <div id="upgradeUI" class="upgrade-ui">
-  <h3>Upgrade Tower</h3>
+            <div class="hud-card">
+                ❤️ Health:
+                <span id="health">100</span>
+            </div>
 
-  <p id="towerInfo"></p>
+            <div class="hud-card">
+                💰 Gold:
+                <span id="gold">300</span>
+            </div>
 
-  <button onclick="upgradeTower()">
-    Upgrade Tower
-  </button>
+            <div class="hud-card">
+                🌊 Wave:
+                <span id="wave">1</span>
+            </div>
 
-  <button onclick="sellTower()">
-    Sell Tower
-  </button>
+            <div class="hud-card">
+                🗺️ Map:
+                <span id="mapName">Classic</span>
+            </div>
 
-  <button onclick="closeUpgradeUI()">
-    Close
-  </button>
-</div>
+        </div>
 
-  <script src="script.js"></script>
+        <!-- BOSS BAR -->
+        <div id="bossContainer">
+
+            <div id="bossName">
+                Boss
+            </div>
+
+            <div id="bossBarOuter">
+
+                <div id="bossBarInner"></div>
+
+            </div>
+
+        </div>
+
+        <!-- TOWER MENU -->
+        <div id="towerPanel">
+
+            <h3>Towers</h3>
+
+            <button onclick="selectTower('basic')">
+                🔵 Basic ($100)
+            </button>
+
+            <button onclick="selectTower('rapid')">
+                🟡 Rapid ($150)
+            </button>
+
+            <button onclick="selectTower('sniper')">
+                🟣 Sniper ($250)
+            </button>
+
+            <button onclick="selectTower('splash')">
+                🟠 Splash ($300)
+            </button>
+
+            <button onclick="selectTower('freeze')">
+                ❄️ Freeze ($275)
+            </button>
+
+            <button onclick="selectTower('poison')">
+                ☠️ Poison ($350)
+            </button>
+
+            <button onclick="selectTower('laser')">
+                🔮 Laser ($500)
+            </button>
+
+        </div>
+
+        <!-- GAME BUTTONS -->
+        <div id="controlPanel">
+
+            <button id="pauseBtn"
+                onclick="togglePause()">
+                Pause
+            </button>
+
+            <button onclick="toggleFastForward()">
+                x2 Speed
+            </button>
+
+            <button onclick="returnToMainMenu()">
+                Main Menu
+            </button>
+
+        </div>
+
+        <!-- CANVAS -->
+        <canvas
+            id="gameCanvas"
+            width="1000"
+            height="600">
+        </canvas>
+
+    </div>
+
+    <!-- UPGRADE WINDOW -->
+    <div id="upgradeUI" class="popup">
+
+        <div class="popup-card">
+
+            <h2>Tower Upgrade</h2>
+
+            <div id="towerInfo">
+
+            </div>
+
+            <div class="popup-buttons">
+
+                <button onclick="upgradeTower()">
+                    Upgrade
+                </button>
+
+                <button onclick="sellTower()">
+                    Sell
+                </button>
+
+                <button onclick="closeUpgradeUI()">
+                    Close
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- END SCREEN -->
+    <div id="endScreen" class="screen">
+
+        <div class="menu-card">
+
+            <h1 id="endTitle">
+                Victory
+            </h1>
+
+            <p id="endStats">
+                Statistics
+            </p>
+
+            <button onclick="returnToMainMenu()">
+                Main Menu
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- WAVE ANNOUNCEMENT -->
+    <div id="waveBanner">
+
+        Wave 1
+
+    </div>
+
+    <!-- BOSS WARNING -->
+    <div id="bossWarning">
+
+        ⚠ BOSS INCOMING ⚠
+
+    </div>
+
+    <script src="script.js"></script>
+
 </body>
 </html>
