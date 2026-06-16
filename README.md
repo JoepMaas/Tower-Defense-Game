@@ -1,93 +1,125 @@
-Top Down Tower Defense
+# 🏰 Tower Defense Game
 
-A 2D top-down tower defense game made with HTML, CSS, and JavaScript.
+A browser-based tower defense game built with vanilla JavaScript and HTML5 Canvas. Place towers, survive waves of enemies, defeat bosses, and protect your base across multiple maps and difficulty modes.
 
-Players defend their base by placing towers along the map while waves of enemies follow a path toward the exit. Different tower types, gamemodes, and scaling enemy difficulty create a progressively harder gameplay experience.
+---
 
-Features
-Top-down 2D gameplay
-Main menu system
-Multiple gamemodes
-Normal
-Hard
-Endless
-Multiple tower types
-Upgrade towers
-Basic Tower
-Rapid Tower
-Sniper Tower
-Enemy wave system
-Enemy health bars
-Gold and economy system
-Tower range visualization
-Bullet/projectile combat
-Game over screen
-Progressive difficulty scaling
-Tower placement restrictions
-Collision prevention between towers
-Technologies Used
-HTML5
-CSS3
-JavaScript
-HTML Canvas API
-How To Play
-Start the game from the main menu.
-Select a gamemode.
-Choose a tower type.
-Click on the grass areas to place towers.
-Defeat enemies before they reach the end of the path.
-Earn gold for defeating enemies.
-Survive as many waves as possible.
-Tower Types
-Basic Tower
+## 🎮 Features
 
-Balanced tower with medium range and medium damage.
+- 7 unique tower types with upgrades and sell system
+- 4 enemy types plus bosses and a final boss
+- 4 maps with different layouts
+- 3 game modes: Normal, Hard, and Endless
+- Pause, fast-forward, and hotkey support
+- Particle effects, boss health bar, wave banners
 
-Rapid Tower
+---
 
-Fast attack speed but lower damage.
+## 🗺️ Maps
 
-Sniper Tower
+| Map | Description |
+|--------|-------------|
+| **Classic** | Simple L-shaped path, good for beginners |
+| **Snake** | Long winding path, more time to deal damage |
+| **Cross** | Intersecting path with tight corners |
+| **Spiral** | Complex multi-turn path, hardest to cover |
 
-Very long range and high damage but slower fire rate.
+---
 
-Gamemodes
-Normal
+## 🏗️ Towers
 
-Standard gameplay experience.
+| # | Tower | Cost | Damage | Range | Fire Rate | Special |
+|---|-------|------|--------|-------|-----------|---------|
+| 1 | Basic | $100 | 10 | 140 | Medium | Balanced all-rounder |
+| 2 | Rapid | $150 | 5 | 110 | Fast | High DPS, short range |
+| 3 | Sniper | $250 | 40 | 260 | Slow | Long range, high damage |
+| 4 | Splash | $300 | 35 | 150 | Medium | Area damage |
+| 5 | Freeze | $275 | 8 | 170 | Medium | Slows enemies by 75% |
+| 6 | Poison | $350 | 12 | 180 | Medium | Applies damage over time |
+| 7 | Laser | $500 | 8 | 220 | Very Fast | Continuous high DPS |
 
-Hard
+### Upgrading & Selling
+- **Right-click** a tower to open the upgrade menu
+- Each upgrade increases damage, range, and fire rate
+- Upgrade cost = `$100 × current level`
+- Selling returns **75%** of total gold spent on that tower
 
-Enemies are stronger and faster, while the player starts with fewer resources.
+---
 
-Endless
+## 👾 Enemies
 
-Enemy waves continue infinitely with increasing difficulty.
+| Type | Description |
+|------|-------------|
+| **Normal** | Standard enemy, balanced stats |
+| **Fast** | 1.8× speed, 0.6× HP — hard to hit |
+| **Tank** | 0.6× speed, 4× HP, larger radius |
+| **Regen** | Regenerates HP over time |
+| **Splitter** | Splits into 2 smaller enemies on death |
+| **Boss** | Spawns every 5 waves, high HP, drops $300 |
+| **Final Boss** | Last wave boss, 5× normal boss HP |
 
-Installation
-Download the project files.
-Place all files in the same folder:
-index.html
-style.css
-script.js
-Open index.html in a browser.
+---
 
-No additional libraries or installations are required.
+## 🎯 Game Modes
 
-Future Improvements
+| Mode | Starting Gold | Starting HP | Waves | Notes |
+|------|--------------|-------------|-------|-------|
+| **Normal** | $300 | 100 | 20 | Recommended for new players |
+| **Hard** | $200 | 75 | 30 | More enemies, higher HP and speed |
+| **Endless** | $300 | 100 | ∞ | No victory condition, survive as long as possible |
 
-Possible features for future updates:
+---
 
-Boss enemies
-Tower upgrades
-More maps
-Sound effects and music
-Save system
-Pause menu
-Different enemy classes
-Animated effects
-Controls
-Action	Control
-Select Tower	Click Tower Button
-Place Tower	Left Mouse Click
-Start Game	Click Gamemode Button
+## ⌨️ Hotkeys
+
+| Key | Action |
+|-----|--------|
+| `1` | Select Basic tower |
+| `2` | Select Rapid tower |
+| `3` | Select Sniper tower |
+| `4` | Select Splash tower |
+| `5` | Select Freeze tower |
+| `6` | Select Poison tower |
+| `7` | Select Laser tower |
+| `U` | Upgrade selected tower |
+| `X` | Sell selected tower |
+| `Space` | Pause / Resume |
+| `F` | Toggle fast forward (2×) |
+| `ESC` | Close upgrade menu |
+
+---
+
+## 🚀 How to Run
+
+No build tools or dependencies required.
+
+1. Clone or download the project
+2. Open `index.html` in any modern browser
+3. Select a game mode and map, then start placing towers
+
+```
+project/
+├── index.html
+├── style.css
+└── game.js
+```
+
+---
+
+## 🛠️ Tech Stack
+
+- **HTML5 Canvas** — rendering
+- **Vanilla JavaScript** — all game logic
+- **CSS** — UI styling
+
+No frameworks, no libraries, no build step.
+
+---
+
+## 💡 Tips
+
+- Cover path **bends** with splash or freeze towers — enemies slow down there naturally
+- Use **Sniper** towers on long straight sections for maximum value
+- **Freeze + Poison** combo is very effective against tanks and bosses
+- Sell and reposition towers between waves if your setup isn't working
+- In **Endless** mode, prioritize upgrading existing towers over buying new ones
